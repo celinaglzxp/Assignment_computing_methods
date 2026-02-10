@@ -1,0 +1,110 @@
+Assignment 2: Intro to Unix
+Name: Celina Gong
+UNI: xg2467
+--------------------------------
+
+
+1) How many earthquakes are listed in the table?
+Command: wc -l signif.txt.tsv
+Result: 5959-1=5958    #column names
+Or
+Command: tail -n +2 signif.txt.tsv | wc -l
+Result: 5958
+
+
+2) How many columns are in the table?
+Command: head -n 1 signif.txt.tsv | tr '\t' '\n' | wc -l
+Result: 47
+
+
+3) Extract YEAR, EQ_PRIMARY, COUNTRY
+Command: cut -f 3,10,18 signif.txt.tsv > Year_Mag_Country.tsv
+
+
+4) Top 10 largest earthquakes
+Command: tail -n +2 Year_Mag_Country.tsv | sort -t$'\t' -k2,2nr | head -n 10
+Result:
+1960     9.5    CHILE
+1964     9.2    USA
+2004     9.1    INDONESIA
+2011     9.1    JAPAN
+1700     9.0    USA
+1952     9.0    RUSSIA
+1716     8.8    PERU
+1812     8.8    USA
+2010     8.8    CHILE
+1513     8.7    PERU
+
+
+5) How many unique countries are listed in the database?
+Command: tail -n +2 Year_Mag_Country.tsv | cut -f 3 | sort | uniq | wc -l
+Result: 153
+
+
+6) How many earthquakes in the database are located in the USA or USA TERRITORY?
+Command: tail -n +2 Year_Mag_Country.tsv | cut -f 3 | grep 'USA' | wc -l
+Result: 294
+
+
+7) How many earthquakes in the database are located in USA (excluding territories)?
+Command: tail -n +2 Year_Mag_Country.tsv | cut -f 3 | grep 'USA' | grep -v 'TERRITORY' | wc -l
+Result: 255
+
+
+8) Top 10 countries by number of earthquakes
+Command: tail -n +2 Year_Mag_Country.tsv | cut -f 3 | sort | uniq -c | sort -nr | head -n 10
+Result:
+    579 CHINA
+    400 JAPAN
+    365 IRAN
+    363 INDONESIA
+    324 ITALY
+    319 TURKEY
+    259 GREECE
+    255 USA
+    207 PHILIPPINES
+    193 MEXICO
+
+
+9) countEq.sh script
+Script: 
+#!/bin/bash
+country="$1"
+tail -n +2 Year_Mag_Country.tsv | cut -f 3 | grep "$country" | wc -l    #exact matching: grep -Fx "$country"
+
+Example (USA): bash countEq.sh USA
+
+Output: 294    #for exact matching (excluding territories): 255
+
+
+10) countEq_getLargestEq.sh script
+Script:
+#!/bin/bash
+country="$1"
+tail -n +2 Year_Mag_Country.tsv | cut -f 3 | grep "$country" | wc -l
+tail -n +2 Year_Mag_Country.tsv | grep "$country" | cut -f 2 | sort -n | tail -n 1
+
+Example (CHILE): bash countEq_getLargestEq.sh CHILE
+
+Output:
+Total earthquakes:
+192
+The largest earthquake:
+ 9.5
+
+
+11) Top 10 years with most earthquakes
+Command: tail -n +2 Year_Mag_Country.tsv | cut -f 1 | sort | uniq -c | sort -nr | head -n 10
+Result:
+     78 2004
+     77 2008
+     72 2003
+     67 2007
+     62 2010
+     61 2006
+     60 2009
+     60 2005
+     60 2002
+     59 2011
+
+
